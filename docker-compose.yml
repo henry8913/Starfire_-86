@@ -13,11 +13,9 @@ services:
       - ./style.css:/usr/share/nginx/html/style.css:ro
       - ./script.js:/usr/share/nginx/html/script.js:ro
     networks:
-      - proxy
+      - npm_default
 
-# IMPORTANTE: usa la STESSA rete di Nginx Proxy Manager.
-# Guarda la sezione "networks" del docker-compose dei tuoi altri progetti
-# e metti qui lo stesso nome al posto di "proxy".
+# Rete di Nginx Proxy Manager (esterna, gia' esistente sul server).
 networks:
-  proxy:
+  npm_default:
     external: true
