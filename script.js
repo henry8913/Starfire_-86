@@ -590,7 +590,7 @@
         y: -t.h - 5 - Math.abs(off) * 0.4,
         w: t.w, h: t.h, hp: t.hp, pts: t.pts,
         c1: t.c1, c2: t.c2,
-        spd: t.spd + 0.4 + Math.random() * 0.4,
+        spd: t.spd + 0.3 + (level - 1) * 0.03 + Math.random() * 0.3,
         t0: Math.random() * 100,
         wiggle: false,
         dive: !!t.dive,
@@ -609,7 +609,7 @@
       y: -t.h - 5,
       w: t.w, h: t.h, hp: t.hp, pts: t.pts,
       c1: t.c1, c2: t.c2,
-      spd: t.spd + Math.random() * 1.2,
+      spd: t.spd + (level - 1) * 0.03 + Math.random() * 0.9,
       t0: Math.random() * 100,
       wiggle: Math.random() > 0.6 && !t.dive,
       dive: !!t.dive,
@@ -668,7 +668,7 @@
     level = l;
     levelState = 'wave';
     levelKilled = 0;
-    levelTotal = 7 + l * 3;
+    levelTotal = Math.min(24, 6 + l * 2);
     boss = null;
     ebullets = [];
     enemies = [];
@@ -681,7 +681,7 @@
   function spawnBoss() {
     const kind = (level - 1) % BOSS_KINDS.length;
     const k = BOSS_KINDS[kind];
-    const hp = Math.round((24 + level * 16) * k.hpMul);
+    const hp = Math.round((18 + level * 9) * k.hpMul);
     boss = {
       x: W / 2, y: 70, w: k.w, h: k.h,
       hp, maxHp: hp, pts: 5000 + kind * 1500,
@@ -844,6 +844,11 @@
     updateLivesIcons();
     invuln = 60;
     if (lives <= 0) beginContinue();
+  }
+
+  // Hitbox "core" della nave: piu' piccola dello sprite, per un gioco piu' giusto (soprattutto su mobile)
+  function shipHit() {
+    return { x: ship.x - 9, y: ship.y + 4, w: 18, h: 16 };
   }
 
   // ---------- CONTINUA (classico arcade: riparti dal punto in cui sei morto) ----------
@@ -1209,7 +1214,7 @@
         if (boss.fireTimer <= 0) {
           bossFire();
           const iv = (BOSS_KINDS[boss.kind] || BOSS_KINDS[0]).iv;
-          boss.fireTimer = Math.max(24, iv - level * 3);
+          boss.fireTimer = Math.max(30, iv - level * 2);
         }
 
         for (let j = bullets.length - 1; j >= 0; j--) {
@@ -1230,8 +1235,8 @@
       const b = ebullets[i];
       b.x += b.vx; b.y += b.vy;
       if (b.x < -20 || b.x > W + 20 || b.y < -20 || b.y > H + 20) { ebullets.splice(i, 1); continue; }
-      const sx = ship.x - 22, sw = 44, sy = ship.y, sh = 26;
-      if (invuln <= 0 && b.x + b.r > sx && b.x - b.r < sx + sw && b.y + b.r > sy && b.y - b.r < sy + sh) {
+      const hr = shipHit();
+      if (invuln <= 0 && b.x + b.r > hr.x && b.x - b.r < hr.x + hr.w && b.y + b.r > hr.y && b.y - b.r < hr.y + hr.h) {
         ebullets.splice(i, 1);
         hitShip();
       }
@@ -1241,7 +1246,7 @@
     if (levelState === 'wave' && levelKilled < levelTotal) {
       if (spawnTimer <= 0) {
         if (Math.random() < 0.4) spawnSquad(); else spawnEnemy();
-        spawnTimer = Math.max(16, 92 - level * 5);
+        spawnTimer = Math.max(20, 96 - level * 4);
       } else spawnTimer--;
     }
 
@@ -1259,12 +1264,12 @@
         if (!e.dived && e.y > 180) {
           e.dived = true;
           e.sx = e.x;
-          e.spd = 3.6;
+          e.spd = 3.0;
         }
         if (e.dived) {
           const target = ship.x;
           const dir = target > e.x ? 1 : -1;
-          e.x += dir * 2.4;
+          e.x += dir * 1.7;
           e.x = Math.max(8, Math.min(W - e.w - 8, e.x));
         }
       }
@@ -1294,8 +1299,8 @@
 
       const ex2 = e.wiggle ? Math.sin((frame + e.t0) * 0.05) * 25 : 0;
       const cx = e.x + ex2;
-      const sx = ship.x - 22, sw = 44, sy = ship.y, sh = 26;
-      if (invuln <= 0 && e.y + e.h > sy && e.y < sy + sh && cx + e.w > sx && cx < sx + sw) {
+      const hr = shipHit();
+      if (invuln <= 0 && e.y + e.h > hr.y && e.y < hr.y + hr.h && cx + e.w > hr.x && cx < hr.x + hr.w) {
         enemies.splice(i, 1);
         hitShip();
       }

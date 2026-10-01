@@ -21,5 +21,11 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
-            sudo docker compose up -d --force-recreate
-            echo "Deploy completato: $(git rev-parse --short HEAD) - $(date -u +%FT%TZ)"
+            # Cache-busting: aggiunge ?v=<commit> a css/js/immagine, cosi' browser e Cloudflare
+            # scaricano SEMPRE la versione nuova ad ogni deploy.
+            V=$(git rev-parse --short HEAD)
+            # (dopo git reset l'HTML e' sempre pulito, quindi basta aggiungere il ?v=)
+            sed -i "s#href=\"style.css\"#href=\"style.css?v=$V\"#; s#src=\"script.js\"#src=\"script.js?v=$V\"#; s#IMG/cover.jpg\"#IMG/cover.jpg?v=$V\"#g" index.html
+            # Ricrea il container da zero (rimette online la versione nuova)
+            sudo docker compose up -d --force-recreate --remove-orphans
+            echo "Deploy completato: $V - $(date -u +%FT%TZ)"
