@@ -78,7 +78,6 @@
     el.textContent = muted ? 'OFF' : 'ON';
     el.classList.toggle('off', muted);
     saveItem('starfiremute', muted ? '1' : '0');
-    if (muted) stopMusic(); else if (state === 'playing' && !paused) startMusic();
   }
   function ensureAudio() {
     if (!ac) {
@@ -111,21 +110,6 @@
   function sndBomb() { tone(120, 30, 0.7, 'sawtooth', 0.16); setTimeout(() => tone(60, 20, 0.8, 'sawtooth', 0.12), 80); }
   function sndBoss() { tone(90, 40, 0.5, 'sawtooth', 0.12); setTimeout(() => tone(60, 30, 0.6, 'sawtooth', 0.12), 120); }
   function sndOver() { tone(420, 60, 0.6, 'sawtooth', 0.11); setTimeout(() => tone(200, 40, 0.7, 'sawtooth', 0.11), 180); }
-
-  // ---------- musica retrò di sottofondo (WebAudio) ----------
-  let musicTimer = null, musicStep = 0;
-  const MUSIC_BASS = [110, 110, 146.83, 110, 130.81, 130.81, 164.81, 130.81];
-  const MUSIC_LEAD = [440, 554.37, 659.25, 554.37, 493.88, 659.25, 587.33, 493.88];
-  function musicTick() {
-    if (muted) return;
-    if (!ensureAudio()) return;
-    const i = musicStep % 8;
-    tone(MUSIC_BASS[i], null, 0.15, 'triangle', 0.045);
-    if (i % 2 === 0) tone(MUSIC_LEAD[i], null, 0.11, 'square', 0.022);
-    musicStep++;
-  }
-  function startMusic() { if (musicTimer || muted) return; musicStep = 0; musicTimer = setInterval(musicTick, 175); }
-  function stopMusic() { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
 
   function vibrate(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
   function addShake(v) { shake = Math.min(26, shake + v); }
@@ -426,7 +410,6 @@
 
   function showAttract() {
     state = 'menu';
-    stopMusic();
     ovHead.textContent = '1 PLAYER';
     ovTitle.textContent = credits > 0 ? '>> PRESS START <<' : '>> INSERT COIN - 1 GETTONE = 2 CREDITI <<';
     ovScore.textContent = 'RECORD ' + pad(hiShown);
@@ -558,13 +541,11 @@
     lastTime = performance.now();
     acc = 0;
     overlay.classList.remove('show');
-    startMusic();
     requestAnimationFrame(loop);
   }
 
   function endGame() {
     state = 'over';
-    stopMusic();
     sndOver();
     if (score > high) {
       high = score;
@@ -754,7 +735,7 @@
   function spawnBoss() {
     const kind = (level - 1) % BOSS_KINDS.length;
     const k = BOSS_KINDS[kind];
-    const hp = Math.round((18 + level * 9) * k.hpMul);
+    const hp = Math.round((15 + level * 7) * k.hpMul);
     boss = {
       x: W / 2, y: 70, w: k.w, h: k.h,
       hp, maxHp: hp, pts: 5000 + kind * 1500,
@@ -770,7 +751,7 @@
   function bossFire() {
     const b = boss;
     const fx = b.x, fy = b.y + b.h / 2;
-    const spd = 2.4 + level * 0.15;
+    const spd = 2.1 + level * 0.12;
 
     if (b.kind === 1) {
       // POLIPO: anello completo rotante
@@ -825,8 +806,10 @@
     }
     const a0 = Math.atan2(ship.y - b.y, ship.x - b.x);
     ebullets.push({ x: fx, y: fy, vx: Math.cos(a0) * spd, vy: Math.sin(a0) * spd, r: 5 });
-    ebullets.push({ x: fx - 22, y: fy, vx: Math.cos(a0 - 0.4) * spd * 0.85, vy: Math.sin(a0 - 0.4) * spd * 0.85, r: 5 });
-    ebullets.push({ x: fx + 22, y: fy, vx: Math.cos(a0 + 0.4) * spd * 0.85, vy: Math.sin(a0 + 0.4) * spd * 0.85, r: 5 });
+    if (level >= 3) {
+      ebullets.push({ x: fx - 22, y: fy, vx: Math.cos(a0 - 0.4) * spd * 0.85, vy: Math.sin(a0 - 0.4) * spd * 0.85, r: 5 });
+      ebullets.push({ x: fx + 22, y: fy, vx: Math.cos(a0 + 0.4) * spd * 0.85, vy: Math.sin(a0 + 0.4) * spd * 0.85, r: 5 });
+    }
     sndShoot();
   }
 
@@ -949,7 +932,6 @@
   // ---------- CONTINUA (classico arcade: riparti dal punto in cui sei morto) ----------
   function beginContinue() {
     contMode = true;
-    stopMusic();
     contDeadline = performance.now() + 6000;
     contSec = 6;
     overlay.classList.add('show');
@@ -1432,7 +1414,11 @@
         continue;
       }
       e.y += e.spd;
-      if (e.y > H + 30) { enemies.splice(i, 1); continue; }
+      if (e.y > H + 30) {
+        enemies.splice(i, 1);
+        if (levelState === 'wave') levelKilled++; // i nemici sfuggiti contano: l'ondata non diventa infinita
+        continue;
+      }
 
       if (e.dive) {
         if (!e.dived && e.y > 180) {
@@ -1676,6 +1662,8 @@
     get ship() { return Object.assign({}, ship); },
     get bullets() { return bullets.length; },
     get enemies() { return enemies.length; },
+    get enemiesPos() { return enemies.map(function (e) { return { x: e.x + e.w / 2, y: e.y }; }); },
+    get ebulletsPos() { return ebullets.map(function (e) { return { x: e.x, y: e.y, vx: e.vx, vy: e.vy }; }); },
     get score() { return score; },
     get lives() { return lives; },
     get frame() { return frame; },
