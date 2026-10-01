@@ -207,6 +207,48 @@
   }
   #coinBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2a1a40; }
 
+  #shareBtn {
+    background: #2a1a50;
+    border: 3px solid #5a3a9a;
+    color: #0ff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: .65rem;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #120a20, 0 0 16px rgba(0,255,255,.3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #shareBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #120a20; }
+
+  /* Pulsanti pausa / schermo intero (mobile) */
+  #topbtns {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+  }
+  #topbtns button {
+    width: 46px;
+    height: 40px;
+    background: rgba(20,12,40,.42);
+    border: 2px solid rgba(122,75,208,.5);
+    border-radius: 10px;
+    color: #0ff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: .7rem;
+    text-shadow: 0 0 8px #0ff;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #topbtns button:active { background: rgba(90,75,208,.6); }
+
   #ovScore { color: #7dff7d; text-shadow: 0 0 8px #0a0, 0 0 16px #0f0; font-size: .8rem; letter-spacing: 2px; }
 
   #ovNote { color: #8f86b8; font-size: .5rem; letter-spacing: 1px; line-height: 2; }
