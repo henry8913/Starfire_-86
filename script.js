@@ -199,6 +199,35 @@
   restartBtn.addEventListener('click', onRestart);
     coinBtn.addEventListener('click', () => { ensureAudio(); pressCoin(); });
     editNameBtn.addEventListener('click', () => { ensureAudio(); enterMenuName(); });
+
+    // Controlli touch per l'inserimento delle iniziali (mobile)
+    const iniPad = document.getElementById('iniPad');
+    if (iniPad) {
+      iniPad.addEventListener('pointerdown', (e) => {
+        const btn = e.target.closest('[data-ini]');
+        if (!btn || !enteringName) return;
+        e.preventDefault();
+        const act = btn.dataset.ini;
+        if (act === 'up' || act === 'down') {
+          nameLetters[nameCursor] = String.fromCharCode((nameLetters[nameCursor].charCodeAt(0) - 65 + (act === 'up' ? 1 : 25)) % 26 + 65);
+          renderIni(); sndCoin();
+        } else if (act === 'left') {
+          nameCursor = Math.max(0, nameCursor - 1); renderIni();
+        } else if (act === 'right') {
+          nameCursor = Math.min(2, nameCursor + 1); renderIni();
+        } else if (act === 'ok') {
+          confirmName();
+        }
+      });
+    }
+    iniEls.forEach((el, i) => {
+      el.addEventListener('pointerdown', (e) => {
+        if (!enteringName) return;
+        e.preventDefault();
+        nameCursor = i;
+        renderIni();
+      });
+    });
     marqueeEl.addEventListener('click', () => { ensureAudio(); pressCoin(); });
     document.getElementById('snd').addEventListener('click', () => { ensureAudio(); setMuted(!muted); });
 

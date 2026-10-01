@@ -221,7 +221,43 @@
     text-shadow: 0 0 8px #ff8a00;
   }
   .ini.cur { border-color: #ffe14d; box-shadow: 0 0 12px #ff8a00; }
+  .ini { cursor: pointer; }
   .nhint { font-size: .5rem; color: #8f86b8; line-height: 2.2; }
+
+  /* Pad touch per inserimento iniziali (mostrato su mobile) */
+  #iniPad {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    margin: 6px 0 2px;
+  }
+  #iniPad .ipad {
+    min-width: 48px;
+    height: 48px;
+    padding: 0 12px;
+    background: #22143a;
+    border: 3px solid #5a3a9a;
+    border-radius: 10px;
+    color: #0ff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    text-shadow: 0 0 8px #0ff;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #iniPad .ipad:active { transform: translateY(2px); background: #3a2a5e; }
+  #iniPad .ipad.ok { min-width: 104px; border-color: #3fa93f; color: #7dff7d; text-shadow: 0 0 8px #0a0; }
+  #iniPad .ipad.ok:active { background: #1a3a1a; }
+
+  body.mobile #iniPad { display: flex; }
+  body.mobile #nameEntry .nhint { display: none; }
+  body.mobile #iniPad .ipad { min-width: 58px; height: 58px; font-size: 1.15rem; }
+  body.mobile #iniPad .ipad.ok { min-width: 132px; }
 
   #scoreTable {
     width: 100%;
@@ -282,15 +318,15 @@
     margin: -66px 0 0 -66px;
     border-radius: 50%;
     background:
-      repeating-conic-gradient(from 0deg, rgba(0,255,255,.08) 0deg 20deg, transparent 20deg 40deg),
-      radial-gradient(circle at 50% 42%, rgba(90,58,154,.5), rgba(18,10,32,.5));
-    border: 3px solid #5a3a9a;
-    box-shadow: inset 0 0 26px rgba(0,255,255,.16), 0 0 22px rgba(122,75,208,.5);
+      repeating-conic-gradient(from 0deg, rgba(0,255,255,.05) 0deg 20deg, transparent 20deg 40deg),
+      radial-gradient(circle at 50% 42%, rgba(90,58,154,.26), rgba(18,10,32,.26));
+    border: 3px solid rgba(90,58,154,.45);
+    box-shadow: inset 0 0 18px rgba(0,255,255,.1);
     opacity: 0;
     transition: opacity .15s ease;
     pointer-events: none;
   }
-  #joystick.active { opacity: .7; }
+  #joystick.active { opacity: .45; }
   #stick {
     position: absolute;
     left: 50%;
@@ -299,9 +335,9 @@
     height: 60px;
     margin: -30px 0 0 -30px;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, rgba(122,90,208,.92), rgba(42,26,80,.92));
-    border: 3px solid rgba(0,255,255,.85);
-    box-shadow: 0 0 16px rgba(0,255,255,.6), inset 0 0 12px rgba(0,255,255,.25);
+    background: radial-gradient(circle at 40% 35%, rgba(122,90,208,.6), rgba(42,26,80,.6));
+    border: 3px solid rgba(0,255,255,.55);
+    box-shadow: 0 0 12px rgba(0,255,255,.38), inset 0 0 10px rgba(0,255,255,.16);
     pointer-events: none;
   }
 
@@ -317,17 +353,15 @@
   }
   .tbtn {
     height: 62px;
-    border: 3px solid rgba(122,75,208,.9);
+    border: 3px solid rgba(122,75,208,.5);
     border-radius: 14px;
-    background: linear-gradient(rgba(58,42,94,.55), rgba(26,18,48,.55));
+    background: linear-gradient(rgba(58,42,94,.24), rgba(26,18,48,.24));
     color: #0ff;
     font-family: 'Press Start 2P', monospace;
     font-size: 1rem;
     letter-spacing: 1px;
     text-shadow: 0 0 8px #0ff;
-    box-shadow: 0 4px 0 rgba(18,10,32,.7), inset 0 0 18px rgba(0,255,255,.12);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    box-shadow: 0 3px 0 rgba(18,10,32,.4), inset 0 0 16px rgba(0,255,255,.08);
     touch-action: none;
     -webkit-user-select: none;
     user-select: none;
@@ -335,14 +369,14 @@
     -webkit-tap-highlight-color: transparent;
   }
   .tbtn:active, .tbtn.pressed {
-    background: linear-gradient(rgba(90,75,208,.72), rgba(42,26,80,.72));
+    background: linear-gradient(rgba(90,75,208,.55), rgba(42,26,80,.55));
     transform: translateY(3px);
-    box-shadow: 0 1px 0 rgba(18,10,32,.7), inset 0 0 18px rgba(0,255,255,.3);
+    box-shadow: 0 1px 0 rgba(18,10,32,.5), inset 0 0 18px rgba(0,255,255,.22);
   }
-  .tbtn.fire { border-color: rgba(255,34,34,.95); color: #ff6b6b; text-shadow: 0 0 8px #f00; height: 104px; font-size: 1rem; }
-  .tbtn.fire:active, .tbtn.fire.pressed { background: linear-gradient(rgba(120,42,42,.72), rgba(58,16,16,.72)); box-shadow: 0 1px 0 rgba(18,10,32,.7), inset 0 0 18px rgba(255,60,60,.3); }
-  .tbtn.bomb { border-color: rgba(34,170,255,.95); color: #6cc8ff; text-shadow: 0 0 8px #08f; font-size: .8rem; height: 62px; }
-  .tbtn.bomb:active, .tbtn.bomb.pressed { background: linear-gradient(rgba(26,58,106,.72), rgba(16,26,58,.72)); box-shadow: 0 1px 0 rgba(18,10,32,.7), inset 0 0 18px rgba(60,140,255,.3); }
+  .tbtn.fire { border-color: rgba(255,34,34,.65); color: #ff6b6b; text-shadow: 0 0 8px #f00; height: 96px; font-size: 1rem; }
+  .tbtn.fire:active, .tbtn.fire.pressed { background: linear-gradient(rgba(120,42,42,.55), rgba(58,16,16,.55)); box-shadow: 0 1px 0 rgba(18,10,32,.5), inset 0 0 18px rgba(255,60,60,.22); }
+  .tbtn.bomb { border-color: rgba(34,170,255,.65); color: #6cc8ff; text-shadow: 0 0 8px #08f; font-size: .8rem; height: 58px; }
+  .tbtn.bomb:active, .tbtn.bomb.pressed { background: linear-gradient(rgba(26,58,106,.55), rgba(16,26,58,.55)); box-shadow: 0 1px 0 rgba(18,10,32,.5), inset 0 0 18px rgba(60,140,255,.22); }
 
   /* ===== Modalità mobile: schermo intero (classe su <body>) ===== */
   body.mobile {
@@ -371,6 +405,8 @@
   body.mobile canvas { width: 100%; height: 100%; max-height: none; }
   body.mobile #hintbar { display: none; }
   body.mobile #touch { display: block; }
+  /* Durante menu / game over / continue i controlli di gioco non servono: nascondili */
+  body.mobile #overlay.show ~ #touch { display: none; }
   body.mobile #overlay { padding: 12px; gap: 10px; overflow-y: auto; }
   body.mobile #overlay h2 { font-size: 1.15rem; }
   body.mobile #overlay .title { font-size: .55rem; }

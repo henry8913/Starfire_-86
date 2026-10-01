@@ -46,7 +46,14 @@
           <p class="nrec">★ INSERISCI LE TUE INIZIALI ★</p>
           <p class="nlabel">GIOCATORE</p>
           <div class="initials" id="initialsBox">
-            <span id="in0" class="ini">A</span><span id="in1" class="ini">A</span><span id="in2" class="ini">A</span>
+            <span id="in0" class="ini" role="button" tabindex="0">A</span><span id="in1" class="ini" role="button" tabindex="0">A</span><span id="in2" class="ini" role="button" tabindex="0">A</span>
+          </div>
+          <div id="iniPad">
+            <button type="button" class="ipad" data-ini="left" aria-label="Posizione precedente">◀</button>
+            <button type="button" class="ipad" data-ini="up" aria-label="Lettera successiva">▲</button>
+            <button type="button" class="ipad" data-ini="down" aria-label="Lettera precedente">▼</button>
+            <button type="button" class="ipad" data-ini="right" aria-label="Posizione successiva">▶</button>
+            <button type="button" class="ipad ok" data-ini="ok" aria-label="Conferma nome">OK</button>
           </div>
           <p class="nhint"><kbd>↑</kbd><kbd>↓</kbd> LETTERA · <kbd>←</kbd><kbd>→</kbd> POSIZIONE · <kbd>INVIO</kbd> OK</p>
         </div>
