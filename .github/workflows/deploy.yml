@@ -17,7 +17,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
-            cd /var/www/starfire
+            cd /var/www/Starfire_-86
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
