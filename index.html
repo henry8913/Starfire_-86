@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0518">
+<title>STARFIRE '86</title>
+<meta name="description" content="STARFIRE '86 - sparatutto arcade retrò verticale: livelli, boss, power-up, gettoni e classifica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>&gt; STARFIRE&nbsp;'86&nbsp;&lt;</h1>
+
+  <div class="cabinet">
+    <div class="marquee" id="marquee" title="Premi C o clicca per un gettone">** 1 PLAYER - INSERT COIN **</div>
+    <div class="hud">
+      <span><span class="lbl">SCORE</span> <span id="score">000000</span></span>
+      <span class="lives-box">
+        <span class="lbl">HI</span> <span id="hi">000000</span>
+      </span>
+    </div>
+    <div class="hud" style="margin-bottom:8px;">
+      <span class="lives-box" id="shipIcons"></span>
+      <span style="display:flex;gap:14px;align-items:center;">
+        <span>SP <span id="sp" title="Super missili">0</span></span>
+        <span>BOMB <span id="bomb" title="Premi B">2</span></span>
+        <span>SND <span id="snd" title="Clicca o premi M">ON</span></span>
+      </span>
+    </div>
+    <div id="wrap">
+      <canvas id="game" width="480" height="640"></canvas>
+      <div id="overlay">
+        <p id="ovTitle" class="title">&gt; INSERT COIN - PRESS START &lt;</p>
+        <h2 id="ovHead">1 PLAYER</h2>
+        <p id="ovScore">RECORD 000000</p>
+        <div id="nameRow">
+          <span class="nlabel">GIOCATORE:</span>
+          <span id="nameDisplay" class="ini mini">AAA</span>
+          <button id="editNameBtn" title="Premi N">✎ NOME</button>
+        </div>
+        <div id="nameEntry" style="display:none;">
+          <p class="nrec">★ INSERISCI LE TUE INIZIALI ★</p>
+          <p class="nlabel">GIOCATORE</p>
+          <div class="initials" id="initialsBox">
+            <span id="in0" class="ini">A</span><span id="in1" class="ini">A</span><span id="in2" class="ini">A</span>
+          </div>
+          <p class="nhint"><kbd>↑</kbd><kbd>↓</kbd> LETTERA · <kbd>←</kbd><kbd>→</kbd> POSIZIONE · <kbd>INVIO</kbd> OK</p>
+        </div>
+        <div id="scoreTable"></div>
+        <p id="ovNote">1 GETTONE = 2 CREDITI · INIZIA = LIVELLO 1 · SE MUORI PUOI CONTINUARE DAL PUNTO IN CUI ERI</p>
+        <p id="ovSub">
+          Muovi con <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd><br>
+          Spara con <kbd>SPAZIO</kbd> · Bomba con <kbd>B</kbd>
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button id="coinBtn" title="Premi C: 1 gettone = 2 crediti">🪙 GETTONE</button>
+          <button id="restart">▶ INIZIA</button>
+        </div>
+      </div>
+      <div id="touch">
+        <div id="joyZone" aria-hidden="true"></div>
+        <div id="joystick" aria-hidden="true"><div id="stick"></div></div>
+        <div id="actions">
+          <button type="button" class="tbtn bomb" id="btnBomb" aria-label="Bomba">BOMB</button>
+          <button type="button" class="tbtn fire" id="btnFire" aria-label="Spara">FIRE</button>
+        </div>
+      </div>
+    </div>
+    <div id="hintbar">
+      <kbd>C</kbd> GETTONE (1=2 CREDITI) · <kbd>N</kbd> NOME · <kbd>B</kbd> BOMBA · <kbd>P</kbd> PAUSA · <kbd>M</kbd> SUONO · <kbd>P</kbd>OWER · <kbd>S</kbd>UPER · <kbd>⚡</kbd>VEL
+    </div>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>

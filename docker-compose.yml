@@ -1,0 +1,23 @@
+# STARFIRE '86 — sito statico servito da nginx
+#
+# Nginx Proxy Manager inoltra  starfire.henrydev.it  ->  starfire:80
+# L'immagine nginx:alpine serve gia' /usr/share/nginx/html sulla porta 80:
+# non serve alcun file di configurazione.
+services:
+  starfire:
+    image: nginx:alpine
+    container_name: starfire
+    restart: unless-stopped
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./style.css:/usr/share/nginx/html/style.css:ro
+      - ./script.js:/usr/share/nginx/html/script.js:ro
+    networks:
+      - proxy
+
+# IMPORTANTE: usa la STESSA rete di Nginx Proxy Manager.
+# Guarda la sezione "networks" del docker-compose dei tuoi altri progetti
+# e metti qui lo stesso nome al posto di "proxy".
+networks:
+  proxy:
+    external: true

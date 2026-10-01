@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+
+# Log
+*.log
+
+# Node (se in futuro aggiungi tooling)
+node_modules/
+
+# Override Docker solo per test locale
+docker-compose.override.yml

@@ -1,0 +1,25 @@
+name: Deploy Starfire '86
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/starfire
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+            sudo docker compose up -d
+            echo "Deploy completato: $(git rev-parse --short HEAD) - $(date -u +%FT%TZ)"
