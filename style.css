@@ -1,5 +1,13 @@
   /* ============ ESTETICA ANNI '90: ARCADE / CRT / PIXEL ============ */
-  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   body {
     background:

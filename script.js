@@ -240,18 +240,26 @@
 
     function bindTouch(id, code, startable, onTap) {
       const el = document.getElementById(id);
+      let tpid = null;
       const on = (e) => {
         e.preventDefault();
         if (startable && state !== 'playing' && !enteringName) { ensureAudio(); startGame(); }
         el.classList.add('pressed');
         setKey(code, true);
+        tpid = e.pointerId;
+        try { el.setPointerCapture(e.pointerId); } catch (err) {}
         if (onTap) onTap();
       };
-      const off = (e) => { if (e) e.preventDefault(); el.classList.remove('pressed'); setKey(code, false); };
+      const off = (e) => {
+        if (e) e.preventDefault();
+        if (tpid !== null && e && e.pointerId !== tpid) return;
+        tpid = null;
+        el.classList.remove('pressed');
+        setKey(code, false);
+      };
       el.addEventListener('pointerdown', on);
       el.addEventListener('pointerup', off);
       el.addEventListener('pointercancel', off);
-      el.addEventListener('pointerleave', off);
       el.addEventListener('contextmenu', (e) => e.preventDefault());
     }
     bindTouch('btnFire', 'Space', true);
@@ -305,7 +313,13 @@
   }
 
   // ---------- dimensionamento canvas (mobile fullscreen) ----------
-  function isTouch() { return window.matchMedia('(pointer: coarse)').matches; }
+  function isTouch() {
+    if (typeof window.matchMedia !== 'function') return (navigator.maxTouchPoints || 0) > 0;
+    return window.matchMedia('(pointer: coarse)').matches ||
+           window.matchMedia('(hover: none)').matches ||
+           ('ontouchstart' in window) ||
+           (navigator.maxTouchPoints || 0) > 0;
+  }
   let forceMobile = null; // null = auto, true/false = override (test)
   function mobileMode() { return forceMobile === null ? isTouch() : forceMobile; }
 
