@@ -264,7 +264,8 @@
     if (!joyZoneEl || !joystickEl || !stickEl) return;
     let active = false, pid = null, originX = 0, originY = 0, maxR = 52;
     function move(e) {
-      if (!active) return;
+      if (!active || e.pointerId !== pid) return;
+      if (e.pointerType === 'mouse' && e.buttons === 0) { end(e); return; }
       let dx = e.clientX - originX, dy = e.clientY - originY;
       const dist = Math.hypot(dx, dy);
       if (dist > maxR) { dx = dx / dist * maxR; dy = dy / dist * maxR; }
@@ -274,7 +275,7 @@
       joyVec.y = Math.abs(dy) < dead ? 0 : dy / maxR;
     }
     function end(e) {
-      if (e && pid !== null && e.pointerId !== pid) return;
+      if (!active || (e && e.pointerId !== pid)) return;
       active = false; pid = null;
       joyVec.x = 0; joyVec.y = 0;
       stickEl.style.transform = 'translate(0,0)';
@@ -297,9 +298,9 @@
       try { joyZoneEl.setPointerCapture(e.pointerId); } catch (err) {}
       move(e);
     });
-    joyZoneEl.addEventListener('pointermove', move);
-    joyZoneEl.addEventListener('pointerup', end);
-    joyZoneEl.addEventListener('pointercancel', end);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
     joyZoneEl.addEventListener('contextmenu', (e) => e.preventDefault());
   }
 

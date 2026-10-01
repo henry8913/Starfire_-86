@@ -388,7 +388,10 @@
     gap: 6px;
     justify-content: flex-start;
     overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: none;
   }
+  body.mobile #game { touch-action: none; }
   body.mobile h1 { display: none; }
   body.mobile .cabinet {
     max-width: none;
