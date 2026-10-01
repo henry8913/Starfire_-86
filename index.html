@@ -6,6 +6,22 @@
 <meta name="theme-color" content="#0a0518">
 <title>STARFIRE '86</title>
 <meta name="description" content="STARFIRE '86 - sparatutto arcade retrò verticale: livelli, boss, power-up, gettoni e classifica.">
+
+<!-- Anteprima social (condivisione link) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="STARFIRE '86">
+<meta property="og:title" content="STARFIRE '86 - sparatutto arcade retrò">
+<meta property="og:description" content="Sparatutto arcade verticale in stile anni '80: livelli, boss, power-up e classifica. Gioca subito nel browser.">
+<meta property="og:url" content="https://starfire.henrydev.it/">
+<meta property="og:image" content="https://starfire.henrydev.it/IMG/cover.png">
+<meta property="og:image:width" content="1672">
+<meta property="og:image:height" content="941">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="STARFIRE '86 - sparatutto arcade retrò">
+<meta name="twitter:description" content="Sparatutto arcade verticale in stile anni '80: livelli, boss, power-up e classifica. Gioca subito nel browser.">
+<meta name="twitter:image" content="https://starfire.henrydev.it/IMG/cover.png">
+<link rel="canonical" href="https://starfire.henrydev.it/">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -43,19 +59,13 @@
           <button id="editNameBtn" title="Premi N">✎ NOME</button>
         </div>
         <div id="nameEntry" style="display:none;">
-          <p class="nrec">★ INSERISCI LE TUE INIZIALI ★</p>
+          <p class="nrec">★ INSERISCI IL TUO NOME ★</p>
           <p class="nlabel">GIOCATORE</p>
-          <div class="initials" id="initialsBox">
-            <span id="in0" class="ini" role="button" tabindex="0">A</span><span id="in1" class="ini" role="button" tabindex="0">A</span><span id="in2" class="ini" role="button" tabindex="0">A</span>
-          </div>
+          <input id="nameInput" type="text" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done" placeholder="AAA" aria-label="Nome giocatore">
           <div id="iniPad">
-            <button type="button" class="ipad" data-ini="left" aria-label="Posizione precedente">◀</button>
-            <button type="button" class="ipad" data-ini="up" aria-label="Lettera successiva">▲</button>
-            <button type="button" class="ipad" data-ini="down" aria-label="Lettera precedente">▼</button>
-            <button type="button" class="ipad" data-ini="right" aria-label="Posizione successiva">▶</button>
             <button type="button" class="ipad ok" data-ini="ok" aria-label="Conferma nome">OK</button>
           </div>
-          <p class="nhint"><kbd>↑</kbd><kbd>↓</kbd> LETTERA · <kbd>←</kbd><kbd>→</kbd> POSIZIONE · <kbd>INVIO</kbd> OK</p>
+          <p class="nhint">MAX 3 LETTERE · <kbd>INVIO</kbd> OK</p>
         </div>
         <div id="scoreTable"></div>
         <p id="ovNote">1 GETTONE = 2 CREDITI · INIZIA = LIVELLO 1 · SE MUORI PUOI CONTINUARE DAL PUNTO IN CUI ERI</p>

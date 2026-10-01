@@ -12,6 +12,7 @@ services:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./style.css:/usr/share/nginx/html/style.css:ro
       - ./script.js:/usr/share/nginx/html/script.js:ro
+      - ./IMG:/usr/share/nginx/html/IMG:ro
     networks:
       - npm_default
 

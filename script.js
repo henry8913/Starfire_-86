@@ -18,7 +18,7 @@
   const nameRowEl = document.getElementById('nameRow');
   const nameDisplayEl = document.getElementById('nameDisplay');
   const editNameBtn = document.getElementById('editNameBtn');
-  const iniEls = [document.getElementById('in0'), document.getElementById('in1'), document.getElementById('in2')];
+  const nameInputEl = document.getElementById('nameInput');
   const joystickEl = document.getElementById('joystick');
   const stickEl = document.getElementById('stick');
   const joyZoneEl = document.getElementById('joyZone');
@@ -56,7 +56,7 @@
   if (!Array.isArray(scores)) scores = [];
   let credits = 3;
   let contMode = false, contSec = 6, contDeadline = 0, contInt = null;
-  let enteringName = false, nameCursor = 0, nameLetters = ['A', 'A', 'A'];
+  let enteringName = false, nameLetters = ['A', 'A', 'A'];
   let nameMode = 'menu', playerName = 'AAA';
   try { const savedName = localStorage.getItem('starfirename'); if (savedName) playerName = savedName.slice(0, 3).toUpperCase(); } catch (e) {}
   let pendingScore = 0, highlightRank = -1;
@@ -158,31 +158,17 @@
   // ---------- input ----------
   function bind() {
     document.addEventListener('keydown', (e) => {
+      // Inserimento nome: lascia digitare al campo, INVIO conferma
+      if (enteringName) {
+        if (e.code === 'Enter' || e.code === 'NumpadEnter') { e.preventDefault(); confirmName(); }
+        return;
+      }
       if (e.code === 'Space') e.preventDefault();
       if (e.code === 'KeyM' && !e.repeat) setMuted(!muted);
       if (e.code === 'KeyC' && !e.repeat) pressCoin();
       if (e.code === 'KeyN' && !e.repeat) enterMenuName();
       if (contMode) {
         if (!e.repeat && (e.code === 'Space' || e.code === 'Enter' || e.code === 'NumpadEnter')) continueGame();
-        return;
-      }
-      if (enteringName) {
-        if (!e.repeat && (e.code === 'ArrowUp' || e.code === 'ArrowDown')) {
-          nameLetters[nameCursor] = String.fromCharCode((nameLetters[nameCursor].charCodeAt(0) - 65 + (e.code === 'ArrowUp' ? 1 : 25)) % 26 + 65);
-          renderIni();
-          sndCoin();
-        } else if (!e.repeat && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
-          nameCursor = Math.max(0, Math.min(2, nameCursor + (e.code === 'ArrowRight' ? 1 : -1)));
-          renderIni();
-        } else if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-          confirmName();
-        } else if (/^Key[A-Z]$/.test(e.code)) {
-          nameLetters[nameCursor] = e.code.slice(3);
-          if (nameCursor < 2) nameCursor++;
-          else confirmName();
-          renderIni();
-          sndCoin();
-        }
         return;
       }
       if (e.code === 'KeyP' && !e.repeat && state === 'playing' && !contMode) paused = !paused;
@@ -200,34 +186,23 @@
     coinBtn.addEventListener('click', () => { ensureAudio(); pressCoin(); });
     editNameBtn.addEventListener('click', () => { ensureAudio(); enterMenuName(); });
 
-    // Controlli touch per l'inserimento delle iniziali (mobile)
+    // Inserimento nome: campo di testo + pulsante OK
     const iniPad = document.getElementById('iniPad');
     if (iniPad) {
       iniPad.addEventListener('pointerdown', (e) => {
         const btn = e.target.closest('[data-ini]');
         if (!btn || !enteringName) return;
         e.preventDefault();
-        const act = btn.dataset.ini;
-        if (act === 'up' || act === 'down') {
-          nameLetters[nameCursor] = String.fromCharCode((nameLetters[nameCursor].charCodeAt(0) - 65 + (act === 'up' ? 1 : 25)) % 26 + 65);
-          renderIni(); sndCoin();
-        } else if (act === 'left') {
-          nameCursor = Math.max(0, nameCursor - 1); renderIni();
-        } else if (act === 'right') {
-          nameCursor = Math.min(2, nameCursor + 1); renderIni();
-        } else if (act === 'ok') {
-          confirmName();
-        }
+        if (btn.dataset.ini === 'ok') confirmName();
       });
     }
-    iniEls.forEach((el, i) => {
-      el.addEventListener('pointerdown', (e) => {
-        if (!enteringName) return;
-        e.preventDefault();
-        nameCursor = i;
-        renderIni();
+    if (nameInputEl) {
+      nameInputEl.addEventListener('input', () => {
+        const v = (nameInputEl.value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+        if (nameInputEl.value !== v) nameInputEl.value = v;
+        nameLetters = v.split('');
       });
-    });
+    }
     marqueeEl.addEventListener('click', () => { ensureAudio(); pressCoin(); });
     document.getElementById('snd').addEventListener('click', () => { ensureAudio(); setMuted(!muted); });
 
@@ -434,7 +409,6 @@
     if (enteringName || state !== 'menu') return;
     enteringName = true;
     nameMode = 'menu';
-    nameCursor = 0;
     nameLetters = playerName.split('');
     ovHead.textContent = 'GIOCATORE';
     ovTitle.textContent = '>> INSERISCI IL TUO NOME <<';
@@ -447,12 +421,12 @@
     scoreTableEl.style.display = 'none';
     nameEntryEl.style.display = '';
     renderIni();
+    focusNameInput();
   }
 
   function showNameEntry() {
     enteringName = true;
     nameMode = 'record';
-    nameCursor = 0;
     nameLetters = playerName.split('');
     pendingScore = score;
     ovHead.textContent = 'NUOVO RECORD!';
@@ -465,20 +439,27 @@
     nameEntryEl.style.display = '';
     scoreTableEl.innerHTML = '';
     renderIni();
+    focusNameInput();
+  }
+
+  function focusNameInput() {
+    if (!nameInputEl) return;
+    try {
+      nameInputEl.focus();
+      nameInputEl.setSelectionRange(0, nameInputEl.value.length);
+    } catch (e) {}
   }
 
   function renderIni() {
-    for (let i = 0; i < 3; i++) {
-      iniEls[i].textContent = nameLetters[i];
-      iniEls[i].classList.toggle('cur', i === nameCursor);
-    }
+    if (nameInputEl) nameInputEl.value = nameLetters.join('');
   }
 
   function confirmName() {
     enteringName = false;
     nameEntryEl.style.display = 'none';
     scoreTableEl.style.display = '';
-    const name = nameLetters.join('');
+    if (nameInputEl) nameInputEl.blur();
+    const name = nameLetters.join('') || 'AAA';
     if (nameMode === 'record') {
       scores.push({ name, score: pendingScore, level });
       scores.sort((a, b) => b.score - a.score);
@@ -667,6 +648,14 @@
   ];
   let theme = THEMES[4];
 
+  // Tipi di boss: ognuno con pattern di fuoco, movimento e colori diversi
+  const BOSS_KINDS = [
+    { name: 'SENTINELLA', hull: '#3a1140', trim: '#5a1a5a', core: '#ff2222', glow: '#f00', hpMul: 1.00, w: 120, h: 92, iv: 70 },
+    { name: 'POLIPO',     hull: '#0e3a3a', trim: '#176a5a', core: '#22ff99', glow: '#0f8', hpMul: 1.15, w: 132, h: 96, iv: 96 },
+    { name: 'ARTIGLIERE', hull: '#3a3210', trim: '#6a5a1a', core: '#ffcc22', glow: '#fc0', hpMul: 1.25, w: 124, h: 90, iv: 44 },
+    { name: 'RAGNATELA',  hull: '#2a0e3a', trim: '#5a1a6a', core: '#cc44ff', glow: '#a0f', hpMul: 1.35, w: 128, h: 96, iv: 56 }
+  ];
+
   function setBanner(txt, dur) { banner.txt = txt; banner.t = dur; banner.max = dur; }
 
   function updateSuperHud() {
@@ -690,29 +679,81 @@
   }
 
   function spawnBoss() {
-    const hp = 24 + level * 16;
-    boss = { x: W / 2, y: 70, w: 120, h: 92, hp, maxHp: hp, pts: 5000, fireTimer: 70, hitFlash: 0, explode: 0 };
+    const kind = (level - 1) % BOSS_KINDS.length;
+    const k = BOSS_KINDS[kind];
+    const hp = Math.round((24 + level * 16) * k.hpMul);
+    boss = {
+      x: W / 2, y: 70, w: k.w, h: k.h,
+      hp, maxHp: hp, pts: 5000 + kind * 1500,
+      fireTimer: 70, hitFlash: 0, explode: 0,
+      kind, angle: Math.random() * Math.PI * 2
+    };
     ebullets = [];
     levelState = 'boss';
-    setBanner('!! ATTENZIONE BOSS !!', 90);
+    setBanner('!! BOSS: ' + k.name + ' !!', 90);
     sndBoss();
   }
 
   function bossFire() {
-    if (level >= 3 && (boss.fireTimer % 2 === 0)) {
-      const n = 10;
+    const b = boss;
+    const fx = b.x, fy = b.y + b.h / 2;
+    const spd = 2.4 + level * 0.15;
+
+    if (b.kind === 1) {
+      // POLIPO: anello completo rotante
+      const n = 12;
       for (let k = 0; k < n; k++) {
-        const a = Math.PI * (k / n) + Math.sin(frame * 0.1) * 0.3;
-        ebullets.push({ x: boss.x, y: boss.y + boss.h / 2, vx: Math.cos(a) * 2.2, vy: Math.sin(a) * 2.2, r: 5 });
+        const a = Math.PI * 2 * (k / n) + b.angle;
+        ebullets.push({ x: fx, y: fy, vx: Math.cos(a) * 1.9, vy: Math.sin(a) * 1.9, r: 5 });
+      }
+      b.angle += 0.35;
+      sndShoot();
+      return;
+    }
+
+    if (b.kind === 2) {
+      // ARTIGLIERE: spirale a 3 bracci
+      for (let k = 0; k < 3; k++) {
+        const a = b.angle + Math.PI * 2 * (k / 3);
+        ebullets.push({ x: fx, y: fy, vx: Math.cos(a) * (spd + 0.4), vy: Math.sin(a) * (spd + 0.4), r: 5 });
+      }
+      b.angle += 0.42;
+      sndShoot();
+      return;
+    }
+
+    if (b.kind === 3) {
+      // RAGNATELA: ventaglio rapido verso la nave + anello periodico
+      const base = Math.atan2(ship.y - b.y, ship.x - b.x);
+      for (let k = -2; k <= 2; k++) {
+        const a = base + k * 0.18;
+        ebullets.push({ x: fx, y: fy, vx: Math.cos(a) * (spd + 0.6), vy: Math.sin(a) * (spd + 0.6), r: 4 });
+      }
+      if (b.fireTimer % 5 === 0) {
+        const n = 14;
+        for (let k = 0; k < n; k++) {
+          const a = Math.PI * 2 * (k / n);
+          ebullets.push({ x: fx, y: fy, vx: Math.cos(a) * 1.8, vy: Math.sin(a) * 1.8, r: 4 });
+        }
       }
       sndShoot();
       return;
     }
-    const a = Math.atan2(ship.y - boss.y, ship.x - boss.x);
-    const spd = 2.4 + level * 0.15;
-    ebullets.push({ x: boss.x, y: boss.y + boss.h / 2, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, r: 5 });
-    ebullets.push({ x: boss.x - 22, y: boss.y + boss.h / 2, vx: Math.cos(a - 0.4) * spd * 0.85, vy: Math.sin(a - 0.4) * spd * 0.85, r: 5 });
-    ebullets.push({ x: boss.x + 22, y: boss.y + boss.h / 2, vx: Math.cos(a + 0.4) * spd * 0.85, vy: Math.sin(a + 0.4) * spd * 0.85, r: 5 });
+
+    // SENTINELLA (kind 0): mirato a 3 vie + anello dai livelli alti
+    if (level >= 3 && (b.fireTimer % 2 === 0)) {
+      const n = 10;
+      for (let k = 0; k < n; k++) {
+        const a = Math.PI * (k / n) + Math.sin(frame * 0.1) * 0.3;
+        ebullets.push({ x: fx, y: fy, vx: Math.cos(a) * 2.2, vy: Math.sin(a) * 2.2, r: 5 });
+      }
+      sndShoot();
+      return;
+    }
+    const a0 = Math.atan2(ship.y - b.y, ship.x - b.x);
+    ebullets.push({ x: fx, y: fy, vx: Math.cos(a0) * spd, vy: Math.sin(a0) * spd, r: 5 });
+    ebullets.push({ x: fx - 22, y: fy, vx: Math.cos(a0 - 0.4) * spd * 0.85, vy: Math.sin(a0 - 0.4) * spd * 0.85, r: 5 });
+    ebullets.push({ x: fx + 22, y: fy, vx: Math.cos(a0 + 0.4) * spd * 0.85, vy: Math.sin(a0 + 0.4) * spd * 0.85, r: 5 });
     sndShoot();
   }
 
@@ -990,8 +1031,33 @@
   function drawBoss() {
     if (!boss || boss.explode > 0) return;
     const b = boss;
+    const k = BOSS_KINDS[b.kind] || BOSS_KINDS[0];
     const bx = b.x, by = b.y;
-    ctx.fillStyle = '#3a1140';
+
+    // dettagli per tipo (dietro il corpo)
+    if (b.kind === 1) {
+      ctx.strokeStyle = k.trim; ctx.lineWidth = 5;
+      for (let s = -2; s <= 2; s++) {
+        ctx.beginPath();
+        ctx.moveTo(bx + s * 20, by + b.h - 6);
+        ctx.lineTo(bx + s * 26, by + b.h + 12 + Math.sin(frame * 0.2 + s) * 5);
+        ctx.stroke();
+      }
+    } else if (b.kind === 3) {
+      ctx.strokeStyle = k.trim; ctx.lineWidth = 4;
+      for (let s = -1; s <= 1; s += 2) {
+        ctx.beginPath();
+        ctx.moveTo(bx + s * (b.w / 2 - 4), by + b.h * 0.4);
+        ctx.lineTo(bx + s * (b.w / 2 + 14), by + b.h * 0.2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(bx + s * (b.w / 2 - 4), by + b.h * 0.7);
+        ctx.lineTo(bx + s * (b.w / 2 + 14), by + b.h * 0.9);
+        ctx.stroke();
+      }
+    }
+
+    ctx.fillStyle = k.hull;
     ctx.beginPath();
     ctx.moveTo(bx - 16, by);
     ctx.lineTo(bx - b.w / 2, by + b.h * 0.55);
@@ -1004,15 +1070,23 @@
     ctx.lineTo(bx + 22, by + b.h);
     ctx.lineTo(bx, by + b.h - 8);
     ctx.fill();
-    ctx.fillStyle = '#5a1a5a';
+    ctx.fillStyle = k.trim;
     ctx.fillRect(bx - b.w / 4, by, b.w / 2, b.h);
     ctx.beginPath();
     ctx.moveTo(bx - b.w / 4, by);
     ctx.lineTo(bx, by - b.h / 3);
     ctx.lineTo(bx + b.w / 4, by);
     ctx.fill();
-    ctx.fillStyle = '#ff2222';
-    ctx.shadowColor = '#f00';
+
+    if (b.kind === 2) {
+      // cannoni laterali
+      ctx.fillStyle = k.trim;
+      ctx.fillRect(bx - b.w / 2 - 6, by + b.h * 0.35, 8, b.h * 0.5);
+      ctx.fillRect(bx + b.w / 2 - 2, by + b.h * 0.35, 8, b.h * 0.5);
+    }
+
+    ctx.fillStyle = k.core;
+    ctx.shadowColor = k.glow;
     ctx.shadowBlur = 18;
     ctx.beginPath();
     ctx.arc(bx, by + b.h / 2, 11, 0, Math.PI * 2);
@@ -1023,11 +1097,13 @@
     ctx.arc(bx, by + b.h / 2, 5, 0, Math.PI * 2);
     ctx.fill();
     const ring = 16 + Math.sin(frame * 0.2) * 3;
-    ctx.strokeStyle = 'rgba(255,60,60,.5)';
+    ctx.strokeStyle = k.glow;
+    ctx.globalAlpha = 0.5;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(bx, by + b.h / 2, ring, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.globalAlpha = 1;
     if (b.hitFlash > 0) {
       ctx.globalAlpha = (b.hitFlash / 6) * 0.6;
       ctx.fillStyle = '#fff';
@@ -1116,10 +1192,25 @@
           startLevel(level + 1);
         }
       } else {
-        boss.x = W / 2 + Math.sin(frame * 0.018) * (W / 2 - boss.w / 2 - 24);
-        boss.y = 70 + Math.sin(frame * 0.03) * 14;
+        if (boss.kind === 1) {
+          boss.x = W / 2 + Math.sin(frame * 0.012) * (W / 2 - boss.w / 2 - 24);
+          boss.y = 70 + Math.sin(frame * 0.024) * 22;
+        } else if (boss.kind === 2) {
+          boss.x = W / 2 + Math.sin(frame * 0.03) * (W / 2 - boss.w / 2 - 20);
+          boss.y = 70 + Math.sin(frame * 0.05) * 18;
+        } else if (boss.kind === 3) {
+          boss.x = W / 2 + Math.sin(frame * 0.04) * (W / 2 - boss.w / 2 - 24);
+          boss.y = 90 + Math.abs(Math.sin(frame * 0.02)) * 60;
+        } else {
+          boss.x = W / 2 + Math.sin(frame * 0.018) * (W / 2 - boss.w / 2 - 24);
+          boss.y = 70 + Math.sin(frame * 0.03) * 14;
+        }
         boss.fireTimer--;
-        if (boss.fireTimer <= 0) { bossFire(); boss.fireTimer = Math.max(28, 70 - level * 4); }
+        if (boss.fireTimer <= 0) {
+          bossFire();
+          const iv = (BOSS_KINDS[boss.kind] || BOSS_KINDS[0]).iv;
+          boss.fireTimer = Math.max(24, iv - level * 3);
+        }
 
         for (let j = bullets.length - 1; j >= 0; j--) {
           const b = bullets[j];

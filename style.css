@@ -232,6 +232,33 @@
   .ini { cursor: pointer; }
   .nhint { font-size: .5rem; color: #8f86b8; line-height: 2.2; }
 
+  /* Campo nome: tastiera nativa del telefono */
+  #nameInput {
+    width: 200px;
+    height: 56px;
+    text-align: center;
+    text-transform: uppercase;
+    background: #22143a;
+    border: 3px solid #5a3a9a;
+    border-radius: 10px;
+    color: #ffe14d;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.6rem;
+    letter-spacing: 6px;
+    text-indent: 6px;
+    text-shadow: 0 0 8px #ff8a00;
+    caret-color: #ffe14d;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+  #nameInput::placeholder { color: #5a4a7a; }
+  #nameInput:focus { border-color: #ffe14d; box-shadow: 0 0 14px #ff8a00; }
+  body.mobile #nameInput { width: 62%; max-width: 260px; height: 62px; font-size: 1.8rem; }
+
   /* Pad touch per inserimento iniziali (mostrato su mobile) */
   #iniPad {
     display: none;
