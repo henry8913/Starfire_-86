@@ -25,7 +25,7 @@ jobs:
             # scaricano SEMPRE la versione nuova ad ogni deploy.
             V=$(git rev-parse --short HEAD)
             # (dopo git reset l'HTML e' sempre pulito, quindi basta aggiungere il ?v=)
-            sed -i "s#href=\"style.css\"#href=\"style.css?v=$V\"#; s#src=\"script.js\"#src=\"script.js?v=$V\"#; s#IMG/cover.jpg\"#IMG/cover.jpg?v=$V\"#g" index.html
+            sed -i "s#href=\"style.css\"#href=\"style.css?v=$V\"#; s#src=\"script.js\"#src=\"script.js?v=$V\"#; s#IMG/tag.jpg\"#IMG/tag.jpg?v=$V\"#g" index.html
             # Ricrea il container da zero (rimette online la versione nuova)
             sudo docker compose up -d --force-recreate --remove-orphans
             echo "Deploy completato: $V - $(date -u +%FT%TZ)"
