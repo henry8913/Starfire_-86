@@ -1522,6 +1522,183 @@
     }
   }
 
+  // ---------- scenografia per livello (dietro il gioco) ----------
+  function drawDunes(baseY, color, amp) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 14) {
+      ctx.lineTo(x, baseY - Math.sin(x * 0.012 + amp * 3) * 16 * amp);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawSnow(prefix, count, rise) {
+    for (let i = 0; i < count; i++) {
+      const seed = i * 127.1;
+      const x = (Math.sin(seed) * 0.5 + 0.5) * W;
+      const speed = 0.6 + (i % 5) * 0.3;
+      const y = ((Math.cos(seed * 1.7) * 0.5 + 0.5) * H + (rise ? -frame * speed : frame * speed)) % H;
+      ctx.fillStyle = prefix + (0.35 + (i % 3) * 0.15) + ')';
+      ctx.fillRect(x + Math.sin(frame * 0.03 + i) * 6, (y + H) % H, 2, 2);
+    }
+  }
+
+  function drawIce(baseY) {
+    ctx.fillStyle = 'rgba(150,215,255,.45)';
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    let x = 0;
+    while (x < W) {
+      const w = 28 + ((x * 7) % 18);
+      const h = 24 + Math.abs(Math.sin(x * 0.11)) * 66;
+      ctx.lineTo(x, baseY - h);
+      ctx.lineTo(x + w / 2, baseY - h - 12);
+      ctx.lineTo(x + w, baseY);
+      x += w;
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawCity() {
+    let x = -8, i = 0;
+    while (x < W) {
+      const w = 22 + ((i * 37) % 24);
+      const h = 50 + ((i * 53) % 130);
+      ctx.fillStyle = 'rgba(18,8,36,.85)';
+      ctx.fillRect(x, H - h, w, h);
+      ctx.fillStyle = 'rgba(255,215,120,.45)';
+      for (let yy = H - h + 8; yy < H - 10; yy += 14) {
+        for (let xx = x + 5; xx < x + w - 5; xx += 9) {
+          if ((Math.floor(xx) + Math.floor(yy) + i) % 3 === 0) ctx.fillRect(xx, yy, 3, 5);
+        }
+      }
+      x += w + 5;
+      i++;
+    }
+  }
+
+  function drawJungle() {
+    // chioma in alto
+    ctx.fillStyle = 'rgba(16,86,38,.85)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    for (let x = 0; x <= W; x += 16) {
+      ctx.lineTo(x, 26 + Math.sin(x * 0.045) * 18);
+    }
+    ctx.lineTo(W, 0);
+    ctx.closePath();
+    ctx.fill();
+    // fronde che pendono
+    ctx.strokeStyle = 'rgba(24,120,54,.7)';
+    ctx.lineWidth = 5;
+    for (let i = 0; i < 6; i++) {
+      const x = W * (0.1 + i * 0.16);
+      ctx.beginPath();
+      ctx.moveTo(x, 8);
+      ctx.quadraticCurveTo(x + 10, 60 + Math.sin(frame * 0.02 + i) * 6, x - 6, 96);
+      ctx.stroke();
+    }
+    // alberi ai lati
+    ctx.fillStyle = 'rgba(8,58,26,.92)';
+    for (const s of [0.08, 0.92]) {
+      const bx = W * s;
+      ctx.beginPath();
+      ctx.moveTo(bx - 30, H);
+      ctx.lineTo(bx, H * 0.34);
+      ctx.lineTo(bx + 30, H);
+      ctx.fill();
+    }
+    // cespugli in basso
+    drawDunes(H * 0.88, 'rgba(14,80,32,.8)', 0.6);
+  }
+
+  function drawNebula() {
+    const cols = ['rgba(130,60,210,', 'rgba(60,120,210,', 'rgba(210,60,160,'];
+    for (let i = 0; i < 3; i++) {
+      const cx = W * (0.28 + i * 0.22), cy = H * (0.28 + i * 0.12);
+      const g = ctx.createRadialGradient(cx, cy, 8, cx, cy, H * 0.42);
+      g.addColorStop(0, cols[i] + '.12)');
+      g.addColorStop(1, cols[i] + '0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function drawPlanet() {
+    ctx.fillStyle = 'rgba(185,125,225,.35)';
+    ctx.beginPath();
+    ctx.arc(W * 0.8, H * 0.17, 32, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(220,180,255,.32)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(W * 0.8, H * 0.17, 52, 13, -0.4, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawVolcano() {
+    const glow = 0.10 + (Math.sin(frame * 0.05) * 0.5 + 0.5) * 0.08;
+    const g = ctx.createRadialGradient(W / 2, H, 10, W / 2, H, H * 0.65);
+    g.addColorStop(0, 'rgba(255,80,20,' + glow + ')');
+    g.addColorStop(1, 'rgba(255,80,20,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, H * 0.35, W, H * 0.65);
+    ctx.fillStyle = 'rgba(30,10,8,.9)';
+    ctx.beginPath();
+    ctx.moveTo(W * 0.12, H);
+    ctx.lineTo(W * 0.5, H * 0.6);
+    ctx.lineTo(W * 0.88, H);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,120,40,' + (0.6 + Math.sin(frame * 0.1) * 0.3) + ')';
+    ctx.beginPath();
+    ctx.moveTo(W * 0.44, H * 0.62);
+    ctx.lineTo(W * 0.56, H * 0.62);
+    ctx.lineTo(W * 0.5, H * 0.575);
+    ctx.fill();
+  }
+
+  function drawScenery() {
+    const n = theme.name;
+    if (n === 'DESERTO') {
+      ctx.fillStyle = 'rgba(255,240,200,.8)';
+      ctx.beginPath(); ctx.arc(W * 0.78, H * 0.16, 24, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,205,150,.45)';
+      ctx.beginPath(); ctx.arc(W * 0.64, H * 0.23, 12, 0, Math.PI * 2); ctx.fill();
+      drawDunes(H * 0.78, 'rgba(120,80,30,.5)', 0.9);
+      drawDunes(H * 0.87, 'rgba(90,58,20,.75)', 0.6);
+    } else if (n === 'ARTICO') {
+      for (let i = 0; i < 3; i++) {
+        const yy = H * 0.1 + i * 24;
+        ctx.fillStyle = 'rgba(120,255,220,' + (0.05 + i * 0.03) + ')';
+        ctx.beginPath();
+        ctx.moveTo(0, yy);
+        ctx.quadraticCurveTo(W / 2, yy - 22 - Math.sin(frame * 0.02 + i) * 10, W, yy);
+        ctx.lineTo(W, yy + 16);
+        ctx.quadraticCurveTo(W / 2, yy - 4 - Math.sin(frame * 0.02 + i) * 10, 0, yy + 16);
+        ctx.fill();
+      }
+      drawIce(H * 0.84);
+      drawSnow('rgba(255,255,255,', 60);
+    } else if (n === 'CITTA') {
+      ctx.fillStyle = 'rgba(230,230,255,.75)';
+      ctx.beginPath(); ctx.arc(W * 0.2, H * 0.14, 16, 0, Math.PI * 2); ctx.fill();
+      drawCity();
+    } else if (n === 'GIUNGLA') {
+      drawJungle();
+    } else if (n === 'SPAZIO') {
+      drawNebula();
+      drawPlanet();
+    } else if (n === 'VULCANO') {
+      drawVolcano();
+      drawSnow('rgba(255,140,60,', 40, true);
+    }
+  }
+
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
@@ -1530,6 +1707,8 @@
     g.addColorStop(1, theme.bottom);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
+
+    drawScenery();
 
     // Screen shake: trema la scena (non lo sfondo)
     const shx = shake > 0 ? (Math.random() - 0.5) * shake : 0;
