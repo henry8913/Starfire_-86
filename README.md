@@ -27,6 +27,12 @@ Il gioco è **100% front-end** (HTML5 Canvas + JavaScript puro): gira nel browse
 
 ## 🎮 Caratteristiche Principali
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/abozanona/abozanona/output/galaga-contribution-graph-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/abozanona/abozanona/output/galaga-contribution-graph.svg">
+  <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/abozanona/abozanona/output/galaga-contribution-graph.svg">
+</picture>
+
 ### Gameplay Arcade
 - Sparatutto verticale a scorrimento con **livelli infiniti** e difficoltà progressiva
 - **Boss a fasi**: ad ogni livello un boss diverso che a metà vita entra in **FASE 2** (attacchi più aggressivi)
@@ -179,16 +185,6 @@ python3 -m http.server 8080
 # opzione 2: con Docker (nginx)
 docker compose up -d
 ```
-
-## 📈 Attività
-
-<!-- Grafico delle contribution in stile Galaga.
-     Generato automaticamente dalla GitHub Action (.github/workflows/arcade-graph.yml). -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/henry8913/Starfire_-86/output/galaga-contribution-graph-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/henry8913/Starfire_-86/output/galaga-contribution-graph.svg">
-  <img alt="galaga contribution graph" src="https://raw.githubusercontent.com/henry8913/Starfire_-86/output/galaga-contribution-graph.svg">
-</picture>
 
 ## 👤 Autore
 
